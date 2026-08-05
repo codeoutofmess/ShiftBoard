@@ -11,4 +11,4 @@ services:
       - key: Jwt__Key
         generateValue: true
       - key: Cors__AllowedOrigins__0
-        value: https://REPLACE-WITH-VERCEL-URL.vercel.app
+        value: https://shiftboard-web-theta.vercel.app

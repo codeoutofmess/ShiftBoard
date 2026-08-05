@@ -118,13 +118,14 @@ real user data, so leaving it discoverable is more useful than locking it down.
 - **API** ([`ShiftBoard.Api/Dockerfile`](ShiftBoard.Api/Dockerfile)) → [Render](https://render.com),
   as a Docker web service. [`render.yaml`](render.yaml) is a Render Blueprint — pointing
   Render at this repo auto-configures the service, including a securely generated
-  `Jwt:Key` (Render's `generateValue`, never touches git). SQLite runs on Render's free
-  tier's ephemeral disk, so data resets on every deploy/restart — intentional here, since
-  `SeedDemoData=true` immediately repopulates the same clean demo dataset. Update
-  `Cors:AllowedOrigins` in `render.yaml` (or the Render dashboard) once the frontend's
-  real Vercel URL is known.
+  `Jwt:Key` (Render's `generateValue`, never touches git), and re-syncs automatically on
+  every push to `main`. SQLite runs on Render's free tier's ephemeral disk, so data
+  resets on every deploy/restart — intentional here, since `SeedDemoData=true`
+  immediately repopulates the same clean demo dataset. The free tier also spins down
+  after inactivity, so the first request after a while can take ~50s to respond.
 - **Frontend** (`ShiftBoard.Web/`) → [Vercel](https://vercel.com), zero-config Vite
-  detection. Set `VITE_API_BASE_URL` in the Vercel project's environment variables to
-  the deployed Render API's URL + `/api` (e.g. `https://shiftboard-api.onrender.com/api`).
+  detection. `VITE_API_BASE_URL` is set in the Vercel project's environment variables to
+  the deployed Render API's URL + `/api`.
 
-Live demo: _link once deployed._
+**Live demo:** https://shiftboard-web-theta.vercel.app
+(API: https://shiftboard-api.onrender.com, Swagger at `/swagger`)
