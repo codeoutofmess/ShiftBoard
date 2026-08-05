@@ -1,0 +1,6 @@
+@ShiftBoard.Api_HostAddress = http://localhost:5224
+
+GET {{ShiftBoard.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
