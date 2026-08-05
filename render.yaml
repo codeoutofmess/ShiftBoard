@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: shiftboard-api
+    runtime: docker
+    dockerfilePath: ./ShiftBoard.Api/Dockerfile
+    dockerContext: ./ShiftBoard.Api
+    plan: free
+    envVars:
+      - key: SeedDemoData
+        value: "true"
+      - key: Jwt__Key
+        generateValue: true
+      - key: Cors__AllowedOrigins__0
+        value: https://REPLACE-WITH-VERCEL-URL.vercel.app
