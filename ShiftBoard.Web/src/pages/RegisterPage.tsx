@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { extractErrorMessage } from "../api/auth";
+import { extractErrorMessage } from "../api/errors";
 import { useAuth } from "../auth/useAuth";
 
 export function RegisterPage() {
