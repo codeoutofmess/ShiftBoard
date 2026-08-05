@@ -1,5 +1,10 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ShiftBoard.Api.Data;
+using ShiftBoard.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +13,55 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Paste the JWT returned by /api/auth/login (no 'Bearer ' prefix needed).",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer",
+        },
+    };
+    options.AddSecurityDefinition("Bearer", securityScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, Array.Empty<string>() },
+    });
+});
 
 builder.Services.AddDbContext<ShiftBoardDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwtSection["Key"]
+    ?? throw new InvalidOperationException("Jwt:Key is not configured. Set it via dotnet user-secrets.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSection["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtSection["Audience"],
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromMinutes(1),
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -24,6 +74,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

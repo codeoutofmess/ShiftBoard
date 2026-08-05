@@ -33,6 +33,10 @@ namespace ShiftBoard.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(50)

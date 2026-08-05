@@ -15,5 +15,8 @@ public class Employee
     [Required, MaxLength(50)]
     public string Role { get; set; } = string.Empty;
 
+    [Required]
+    public string PasswordHash { get; set; } = string.Empty;
+
     public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
 }
