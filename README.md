@@ -1,5 +1,7 @@
 # ShiftBoard
 
+[![CI](https://github.com/codeoutofmess/ShiftBoard/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/codeoutofmess/ShiftBoard/actions/workflows/ci.yml)
+
 A small shift-scheduling app for managing employees, locations, and rosters. Built as a
 personal project to get hands-on with ASP.NET Core + EF Core + React, a stack that shows
 up constantly in NZ job postings but that I hadn't used commercially.
@@ -129,3 +131,39 @@ real user data, so leaving it discoverable is more useful than locking it down.
 
 **Live demo:** https://shiftboard-web-theta.vercel.app
 (API: https://shiftboard-api.onrender.com, Swagger at `/swagger`)
+
+## CI/CD
+
+A small GitHub Actions pipeline ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)),
+set up as a learning exercise for this personal project.
+
+**CI** runs on every push and pull request, as two parallel jobs:
+
+| Job      | Steps                                                  |
+| -------- | ------------------------------------------------------ |
+| Backend  | `dotnet restore` → `build` → `test` (.NET 8)           |
+| Frontend | `npm ci` → `lint` (oxlint) → `typecheck` (tsc) → `build` (Node 22) |
+
+Actions are pinned to commit SHAs, the workflow token is read-only, dependencies are
+cached, and a newer push to the same branch cancels the older run.
+
+**CD** is host-side rather than a deploy job in the workflow, and is only as strong as each
+host's setting:
+
+- **API (Render):** `render.yaml` sets `autoDeployTrigger: checksPass` on `main`, so Render
+  deploys only after the commit's GitHub checks pass.
+- **Frontend (Vercel):** Vercel's own Git integration deploys `main`. Vercel does not wait for
+  CI itself; the gate is that `main` only receives changes through pull requests whose CI
+  checks must pass (branch protection).
+
+**Tests:** `ShiftBoard.Api.Tests` covers the shift validation and overlap rules (including
+back-to-back shift boundaries) against an in-memory SQLite database. That is the only logic
+tested; there are no frontend or end-to-end tests.
+
+Not covered: staging environment, automated rollbacks, monitoring/alerting, security
+scanning, or building the Docker image in CI. See [`LEARNING_NOTES.md`](LEARNING_NOTES.md).
+
+```bash
+dotnet test ShiftBoard.sln                      # run the backend tests locally
+cd ShiftBoard.Web && npm run lint && npm run typecheck && npm run build
+```

@@ -5,6 +5,8 @@ services:
     dockerfilePath: ./ShiftBoard.Api/Dockerfile
     dockerContext: ./ShiftBoard.Api
     plan: free
+    branch: main
+    autoDeployTrigger: checksPass
     envVars:
       - key: SeedDemoData
         value: "true"
