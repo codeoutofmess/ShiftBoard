@@ -161,7 +161,7 @@ back-to-back shift boundaries) against an in-memory SQLite database. That is the
 tested; there are no frontend or end-to-end tests.
 
 Not covered: staging environment, automated rollbacks, monitoring/alerting, security
-scanning, or building the Docker image in CI. See [`LEARNING_NOTES.md`](LEARNING_NOTES.md).
+scanning, or building the Docker image in CI.
 
 ```bash
 dotnet test ShiftBoard.sln                      # run the backend tests locally
