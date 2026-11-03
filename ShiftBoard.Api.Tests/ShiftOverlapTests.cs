@@ -50,7 +50,7 @@ public sealed class ShiftOverlapTests : IDisposable
     {
         var result = await Create(1, Nine.AddHours(4), Nine.AddHours(12)); // 13:00-21:00
 
-        Assert.IsType<ConflictObjectResult>(result.Result);
+        Assert.IsType<CreatedAtActionResult>(result.Result);
     }
 
     [Theory]
